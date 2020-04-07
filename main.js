@@ -1,14 +1,20 @@
 
 let myGamePiece;
 let myObstacle;
+let pieceCol = "#ff0500";
+let obsCol = "#00ffA0"
 
+function mixColor(a, b) {
+
+  return newCol;
+}
 function startGame() {
-    myGamePiece = new component(30, 30, "red", 80, 75);
-    myObstacle = new component(150, 30, "green", 80, 150);
+    myGamePiece = new component(30, 30, pieceCol, 80, 75);
+    myObstacle = new component(150, 30, obsCol, 40, 150);
     myGameArea.start();
 }
 
-let myGameArea = {
+var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
         this.canvas.width = 480;
@@ -17,15 +23,13 @@ let myGameArea = {
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateGameArea, 20);
     },
-    stop : function() {
-        clearInterval(this.interval);
-    },
     clear : function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
+    },
+    stop : function() {
+      clearInterval(this.interval);
+  }
 }
-
-
 
 function component(width, height, color, x, y, type) {
     this.type = type;
@@ -38,6 +42,11 @@ function component(width, height, color, x, y, type) {
     this.gravity = 0.05;
     this.gravitySpeed = 0;
     this.update = function() {
+        ctx = myGameArea.context;
+        ctx.fillStyle = pieceCol;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    this.obsUpdate = function() {
         ctx = myGameArea.context;
         ctx.fillStyle = color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -54,11 +63,32 @@ function component(width, height, color, x, y, type) {
             this.y = rockbottom;
         }
     }
+    this.changeColor = function(otherobj) {
+
+      let mybottom = this.y + (this.height)
+      let otherbottom = otherobj.y + (otherobj.height);
+      console.log("my bottom is" + mybottom)
+      console.log("other bottom is" + otherbottom)
+
+      if(mybottom >= otherobj.y)
+      {
+        pieceCol = pieceCol + obsCol;
+        console.log("In changeColor if")
+      }
+      if(mybottom > 269)
+      {
+        myGameArea.stop();
+        console.log("it stopped!")
+      }
+
+    }
 }
 
 function updateGameArea() {
+    myGamePiece.changeColor(myObstacle);
     myGameArea.clear();
     myGamePiece.newPos();
-    myObstacle.update();
+    myObstacle.obsUpdate();
     myGamePiece.update();
+
 }
