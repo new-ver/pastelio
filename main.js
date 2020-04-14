@@ -1,13 +1,21 @@
 
 let myGamePiece;
 let myObstacle;
+
+
 let pieceCol = "#ff0500";
-let obsCol = "#00ffA0"
+let obsCol = "#00ffA0";
 
-function mixColor(a, b) {
+function mixHexColor(c1, c2) {
 
-  return newCol;
+  var newR = Math.round((parseInt(c1.slice(1,3),16)+(parseInt(c2.slice(1,3),16)))/2);
+  var newG = Math.round((parseInt(c1.slice(3,5),16)+(parseInt(c2.slice(3,5),16)))/2);
+  var newB = Math.round((parseInt(c1.slice(5,7),16)+(parseInt(c2.slice(5,7),16)))/2);
+
+  return("#"+newR.toString(16)+newG.toString(16)+newB.toString(16))
 }
+
+//Starts Game
 function startGame() {
     myGamePiece = new component(30, 30, pieceCol, 80, 75);
     myObstacle = new component(150, 30, obsCol, 40, 150);
@@ -72,7 +80,8 @@ function component(width, height, color, x, y, type) {
 
       if(mybottom >= otherobj.y)
       {
-        pieceCol = pieceCol + obsCol;
+        pieceCol = mixHexColor(pieceCol, obsCol);
+        // pieceCol = obsCol;
         console.log("In changeColor if")
       }
       if(mybottom > 269)
