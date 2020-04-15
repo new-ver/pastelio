@@ -2,12 +2,16 @@
 let myGamePiece;
 let myObstacle;
 
-
 let pieceCol = "#ff0500";
 let obsCol = "#00ffA0";
+let obsHitFlag = false;
+
+const GAMESTATE = {
+  PAUSED: 0,
+  RUNNING: 1,
+}
 
 function mixHexColor(c1, c2) {
-
   var newR = Math.round((parseInt(c1.slice(1,3),16)+(parseInt(c2.slice(1,3),16)))/2);
   var newG = Math.round((parseInt(c1.slice(3,5),16)+(parseInt(c2.slice(3,5),16)))/2);
   var newB = Math.round((parseInt(c1.slice(5,7),16)+(parseInt(c2.slice(5,7),16)))/2);
@@ -17,9 +21,12 @@ function mixHexColor(c1, c2) {
 
 //Starts Game
 function startGame() {
+
     myGamePiece = new component(30, 30, pieceCol, 80, 75);
     myObstacle = new component(150, 30, obsCol, 40, 150);
     myGameArea.start();
+    this.gamestate = GAMESTATE.PAUSED;
+
 }
 
 var myGameArea = {
@@ -78,11 +85,11 @@ function component(width, height, color, x, y, type) {
       console.log("my bottom is" + mybottom)
       console.log("other bottom is" + otherbottom)
 
-      if(mybottom >= otherobj.y)
+      if(mybottom >= otherobj.y && obsHitFlag==false)
       {
         pieceCol = mixHexColor(pieceCol, obsCol);
-        // pieceCol = obsCol;
         console.log("In changeColor if")
+        obsHitFlag = true;
       }
       if(mybottom > 269)
       {
@@ -93,11 +100,47 @@ function component(width, height, color, x, y, type) {
     }
 }
 
+//start
+myObstacle.onmousedown = function(event){
+  myObstacle.style.position = 'absolute';
+  myObstacle.style.zIndex = 1000;
+
+  document.body.append(myObstacle);
+  moveAt(event.pageX, event.pageY);
+
+
+// centers the myObstacle at (pageX, pageY) coordinates
+function moveAt(pageX, pageY) {
+  myObstacle.style.left = pageX - myObstacle.offsetWidth / 2 + 'px';
+  myObstacle.style.top = pageY - myObstacle.offsetHeight / 2 + 'px';
+}
+
+function onMouseMove(event) {
+  moveAt(event.pageX, event.pageY);
+}
+
+// (3) move the myObstacle on mousemove
+document.addEventListener('mousemove', onMouseMove);
+
+// (4) drop the myObstacle, remove unneeded handlers
+myObstacle.onmouseup = function() {
+  document.removeEventListener('mousemove', onMouseMove);
+  myObstacle.onmouseup = null;
+};
+
+};
+//slutt
+
 function updateGameArea() {
+
+    console.log("gamestate: " + this.gamestate)
+    myObstacle.obsUpdate();
+    myGamePiece.update();
+    if(this.gamestate === GAMESTATE.PAUSED){
+      return;
+    }
     myGamePiece.changeColor(myObstacle);
     myGameArea.clear();
     myGamePiece.newPos();
-    myObstacle.obsUpdate();
-    myGamePiece.update();
 
 }
